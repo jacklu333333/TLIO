@@ -9,17 +9,17 @@ from os import path as osp
 import matplotlib.pyplot as plt
 import torch
 #from dataloader.dataset_fb import FbSequenceDataset
-from dataloader.tlio_data import TlioData
-from dataloader.memmapped_sequences_dataset import MemMappedSequencesDataset
-from network.losses import get_loss
-from network.model_factory import get_model
+from ..dataloader.tlio_data import TlioData
+from ..dataloader.memmapped_sequences_dataset import MemMappedSequencesDataset
+from ..network.losses import get_loss
+from ..network.model_factory import get_model
 from scipy.interpolate import interp1d
 from scipy.spatial.transform import Rotation
 from torch.utils.data import DataLoader
-from utils.dotdict import dotdict
-from utils.utils import to_device
-from utils.logging import logging
-from utils.math_utils import *
+from ..utils.dotdict import dotdict
+from ..utils.utils import to_device
+from ..utils.logging import logging
+from ..utils.math_utils import *
 
 
 def compute_rpe(rpe_ns, ps, ps_gt, yaw, yaw_gt):

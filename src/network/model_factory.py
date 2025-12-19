@@ -1,8 +1,8 @@
-from network.model_resnet import BasicBlock1D, ResNet1D
-from network.model_resnet_seq import ResNetSeq1D
-from network.model_tcn import TlioTcn
+from ..network.model_resnet import BasicBlock1D, ResNet1D
+from ..network.model_resnet_seq import ResNetSeq1D
+from ..network.model_tcn import TlioTcn
 
-from utils.logging import logging
+from ..utils.logging import logging
 
 def get_model(arch, net_config, input_dim=6, output_dim=3):
     if arch == "resnet":

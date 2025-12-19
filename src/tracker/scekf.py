@@ -1,8 +1,8 @@
 import numpy as np
 from numba import jit
-from utils.from_scipy import compute_euler_from_matrix
-from utils.logging import logging
-from utils.math_utils import Jr_exp, hat, mat_exp, mat_exp_vec, mat_log, rot_2vec
+from ..utils.from_scipy import compute_euler_from_matrix
+from ..utils.logging import logging
+from ..utils.math_utils import Jr_exp, hat, mat_exp, mat_exp_vec, mat_log, rot_2vec
 
 
 class State(object):

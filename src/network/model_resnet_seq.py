@@ -3,7 +3,7 @@ The code is based on the original ResNet implementation from torchvision.models.
 """
 
 import torch.nn as nn
-from network.model_resnet import Bottleneck, conv1x1
+from ..network.model_resnet import Bottleneck, conv1x1
 
 class ResNetSeq1D(nn.Module):
     """

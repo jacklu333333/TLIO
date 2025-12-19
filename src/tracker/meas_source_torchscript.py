@@ -1,7 +1,7 @@
 import numpy as np
 import torch
-from network.covariance_parametrization import DiagonalParam
-from utils.logging import logging
+from ..network.covariance_parametrization import DiagonalParam
+from ..utils.logging import logging
 
 
 class MeasSourceTorchScript:

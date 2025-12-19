@@ -18,8 +18,8 @@ import progressbar
 from mpl_toolkits.mplot3d import Axes3D
 from scipy.interpolate import interp1d
 from scipy.spatial.transform import Rotation
-from utils.logging import logging
-from utils.math_utils import *
+from .utils.logging import logging
+from .utils.math_utils import *
 
 
 color_vio = "C2"

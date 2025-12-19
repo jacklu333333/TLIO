@@ -17,7 +17,7 @@ from itertools import repeat
 from torch.utils.data import DataLoader
 
 
-from utils.logging import logging
+from ..utils.logging import logging
 from .constants import DatasetGenerationParams
 from .memmapped_sequences_dataset import MemMappedSequencesDataset
 from .iterable_pseudorandom_sequences_dataset import IterablePseudoRandomSequencesDataset

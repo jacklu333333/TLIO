@@ -5,15 +5,15 @@ import numpy as np
 import pandas as pd
 import torch
 #from dataloader.dataset_fb import FbSequenceDataset
-from dataloader.tlio_data import TlioData
-from dataloader.memmapped_sequences_dataset import MemMappedSequencesDataset
-from network.losses import get_loss
-from network.model_factory import get_model
+from ..dataloader.tlio_data import TlioData
+from ..dataloader.memmapped_sequences_dataset import MemMappedSequencesDataset
+from ..network.losses import get_loss
+from ..network.model_factory import get_model
 from torch.utils.data import DataLoader
-from utils.dotdict import dotdict
-from utils.utils import to_device
-from utils.logging import logging
-from network.test import torch_to_numpy, get_inference, get_datalist, arg_conversion, get_inference
+from ..utils.dotdict import dotdict
+from ..utils.utils import to_device
+from ..utils.logging import logging
+from ..network.test import torch_to_numpy, get_inference, get_datalist, arg_conversion, get_inference
 
 def net_eval(args):
     """

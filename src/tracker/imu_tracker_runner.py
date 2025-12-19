@@ -9,9 +9,9 @@ from scipy.interpolate import interp1d
 from scipy.spatial.transform import Rotation
 from tracker.imu_calib import ImuCalib
 from tracker.imu_tracker import ImuTracker
-from utils.o3d_visualizer import O3dVisualizer
-from utils.dotdict import dotdict
-from utils.logging import logging
+from ..utils.o3d_visualizer import O3dVisualizer
+from ..utils.dotdict import dotdict
+from ..utils.logging import logging
 
 
 class ImuTrackerRunner:

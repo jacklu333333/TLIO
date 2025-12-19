@@ -17,8 +17,8 @@ from pprint import pprint
 import numpy as np
 from numba.core.errors import NumbaPerformanceWarning
 from tracker.imu_tracker_runner import ImuTrackerRunner
-from utils.argparse_utils import add_bool_arg
-from utils.logging import logging
+from .utils.argparse_utils import add_bool_arg
+from .utils.logging import logging
 
 
 warnings.filterwarnings("ignore", category=NumbaPerformanceWarning)

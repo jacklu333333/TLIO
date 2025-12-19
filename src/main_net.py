@@ -5,7 +5,7 @@ Output: 3x1 displacement, 3x1 covariance parameters
 """
 
 import network
-from utils.argparse_utils import add_bool_arg
+from .utils.argparse_utils import add_bool_arg
 
 
 if __name__ == "__main__":

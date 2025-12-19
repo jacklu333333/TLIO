@@ -15,8 +15,8 @@ import numpy as np
 from collections import defaultdict
 from scipy.spatial.transform import Rotation
 
-from utils.from_scipy import compute_euler_from_matrix
-from utils.logging import get_logger
+from ..utils.from_scipy import compute_euler_from_matrix
+from ..utils.logging import get_logger
 from .constants import *
 
 log = get_logger(__name__)

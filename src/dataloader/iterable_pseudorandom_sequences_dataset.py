@@ -23,7 +23,7 @@ from scipy.spatial.transform import Rotation
 from queue import Queue
 from threading import Thread
 
-from utils.logging import get_logger
+from ..utils.logging import get_logger
 from .sequences_dataset import SequencesDataset
 from .constants import *
 

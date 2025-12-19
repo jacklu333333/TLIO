@@ -13,13 +13,13 @@ from os import path as osp
 import numpy as np
 import torch
 #from dataloader.dataset_fb import FbSequenceDataset
-from dataloader.tlio_data import TlioData
-from network.losses import get_loss
-from network.model_factory import get_model
+from ..dataloader.tlio_data import TlioData
+from ..network.losses import get_loss
+from ..network.model_factory import get_model
 from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
-from utils.logging import logging
-from utils.utils import to_device
+from ..utils.logging import logging
+from ..utils.utils import to_device
 
 def torch_to_numpy(torch_arr):
     return torch_arr.cpu().detach().numpy()

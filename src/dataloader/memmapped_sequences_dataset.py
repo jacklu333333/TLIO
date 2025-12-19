@@ -15,7 +15,7 @@ from collections import defaultdict
 from torch.utils.data import Dataset
 from scipy.spatial.transform import Rotation
 
-from utils.logging import get_logger
+from ..utils.logging import get_logger
 from .sequences_dataset import SequencesDataset
 from .constants import *
 

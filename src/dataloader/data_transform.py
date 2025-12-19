@@ -9,7 +9,7 @@ import numpy as np
 import math
 import torch
 #from pytorch3d.transforms import so3_exponential_map
-from utils.torch_math_utils import so3_exp_map
+from ..utils.torch_math_utils import so3_exp_map
 
 # TODO augs for mag and barom
 class TransformAddNoiseBias:

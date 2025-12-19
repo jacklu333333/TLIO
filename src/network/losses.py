@@ -1,6 +1,6 @@
 import torch
 import numpy as np
-from network.covariance_parametrization import DiagonalParam
+from ..network.covariance_parametrization import DiagonalParam
 
 MIN_LOG_STD = np.log(1e-3)
 

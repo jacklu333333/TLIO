@@ -5,8 +5,8 @@ from pprint import pprint
 
 import numpy as np
 import torch
-from network.model_factory import get_model
-from utils.logging import logging
+from .network.model_factory import get_model
+from .utils.logging import logging
 
 
 def load_and_convert(args):

@@ -2,7 +2,7 @@ import os.path as osp
 
 import json
 import numpy as np
-from utils.logging import logging
+from ..utils.logging import logging
 from scipy.spatial.transform import Rotation
 
 

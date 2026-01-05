@@ -4,8 +4,8 @@ import numpy as np
 import pandas as pd
 from scipy.interpolate import interp1d
 from scipy.spatial.transform import Rotation
-from utils.logging import logging
-from utils.math_utils import unwrap_rpy, wrap_rpy, inv_SE3
+from ..utils.logging import logging
+from ..utils.math_utils import unwrap_rpy, wrap_rpy, inv_SE3
 
 
 class DataIO:
@@ -35,9 +35,9 @@ class DataIO:
         load timestamps, accel and gyro data from dataset
         """
         imu_data = pd.read_csv(osp.join(args.root_dir, dataset, "imu_samples_0.csv"))
-        ts_all = np.copy(imu_data.iloc[:,0]) * 1e-3
-        gyr_all = np.copy(imu_data.iloc[:,2:5])
-        acc_all = np.copy(imu_data.iloc[:,5:8])
+        ts_all = np.copy(imu_data.iloc[:, 0]) * 1e-3
+        gyr_all = np.copy(imu_data.iloc[:, 2:5])
+        acc_all = np.copy(imu_data.iloc[:, 5:8])
         if args.start_from_ts is not None:
             idx_start = np.where(ts_all >= args.start_from_ts)[0][0]
         else:
@@ -59,9 +59,9 @@ class DataIO:
         data = np.load(osp.join(args.root_dir, dataset, "imu0_resampled.npy"))
         self.vio_ts_us = data[:, 0]
         self.vio_ts = data[:, 0] * 1e-6
-        self.vio_rq = data[:,-10:-6]
-        self.vio_p = data[:,-6:-3]
-        self.vio_v = data[:,-3:]
+        self.vio_rq = data[:, -10:-6]
+        self.vio_p = data[:, -6:-3]
+        self.vio_v = data[:, -3:]
         vio_r = Rotation.from_quat(self.vio_rq)
         self.vio_R = vio_r.as_matrix()
         self.vio_eul = vio_r.as_euler("xyz", degrees=True)

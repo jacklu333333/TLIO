@@ -4,11 +4,11 @@ import os
 
 import numpy as np
 import progressbar
-from dataloader.data_io import DataIO
+from ..dataloader.data_io import DataIO
 from scipy.interpolate import interp1d
 from scipy.spatial.transform import Rotation
-from tracker.imu_calib import ImuCalib
-from tracker.imu_tracker import ImuTracker
+from ..tracker.imu_calib import ImuCalib
+from ..tracker.imu_tracker import ImuTracker
 from ..utils.o3d_visualizer import O3dVisualizer
 from ..utils.dotdict import dotdict
 from ..utils.logging import logging
@@ -26,9 +26,10 @@ class ImuTrackerRunner:
         self.input.load_vio(dataset, args)
         self.visualizer = None
         if args.visualize:
-            vio_ghost = np.concatenate([
-                self.input.vio_ts_us[:,None], self.input.vio_rq, self.input.vio_p
-            ], axis=1)
+            vio_ghost = np.concatenate(
+                [self.input.vio_ts_us[:, None], self.input.vio_rq, self.input.vio_p],
+                axis=1,
+            )
             self.visualizer = O3dVisualizer(vio_ghost)
 
         # log file initialization
@@ -83,7 +84,7 @@ class ImuTrackerRunner:
             update_freq=args.update_freq,
             filter_tuning_cfg=filter_tuning,
             imu_calib=imu_calib,
-            #force_cpu=True,
+            # force_cpu=True,
         )
 
         # output
@@ -161,8 +162,8 @@ class ImuTrackerRunner:
             self.tracker.callback_first_update = initialize_at_first_update
 
         if args.use_vio_meas:
-            self.tracker.debug_callback_get_meas = lambda t0, t1: self.input.get_meas_from_vio(
-                t0, t1
+            self.tracker.debug_callback_get_meas = (
+                lambda t0, t1: self.input.get_meas_from_vio(t0, t1)
             )
 
         # Loop through the entire dataset and feed the data to the imu tracker
@@ -192,12 +193,12 @@ class ImuTrackerRunner:
                 )
                 if i % 100 == 0 and self.visualizer is not None:
                     T_World_Imu = np.eye(4)
-                    T_World_Imu[:3,:3] = self.tracker.filter.state.s_R
-                    T_World_Imu[:3,3:4] = self.tracker.filter.state.s_p
+                    T_World_Imu[:3, :3] = self.tracker.filter.state.s_R
+                    T_World_Imu[:3, 3:4] = self.tracker.filter.state.s_p
                     self.visualizer.update(
-                        t_us, 
-                        {"tlio": T_World_Imu},    
-                        {"tlio": [T_World_Imu[:3,3]]},    
+                        t_us,
+                        {"tlio": T_World_Imu},
+                        {"tlio": [T_World_Imu[:3, 3]]},
                     )
             else:
                 # initialize to gt state R,v,p and offline calib
@@ -239,7 +240,7 @@ class ImuTrackerRunner:
             os.remove(self.outfile)
 
     def scale_raw_dynamic(self, t, acc, gyr):
-        """ This scale with gt data, for debug purpose only"""
+        """This scale with gt data, for debug purpose only"""
         idx = np.searchsorted(self.input.vio_calib_ts, t)
         acc_cal = np.dot(self.input.vio_accelScaleInv[idx, :, :], acc)
         gyr_cal = np.dot(self.input.vio_gyroScaleInv[idx, :, :], gyr) - np.dot(
@@ -248,7 +249,7 @@ class ImuTrackerRunner:
         return acc_cal, gyr_cal
 
     def reset_filter_state_from_vio(self, this: ImuTracker):
-        """ This reset the filter state from vio state as found in input """
+        """This reset the filter state from vio state as found in input"""
         # compute from vio
         inp = self.input  # for convenience
         state = this.filter.state  # for convenience
@@ -272,7 +273,7 @@ class ImuTrackerRunner:
         )
 
     def reset_filter_state_pv(self):
-        """ Reset filter states p and v with zeros """
+        """Reset filter states p and v with zeros"""
         state = self.tracker.filter.state
         ps = []
         for i in state.si_timestamps_us:

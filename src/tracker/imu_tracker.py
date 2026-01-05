@@ -42,15 +42,11 @@ class ImuTracker:
             config_from_network["arch"] = data_json["arch"]
 
         # frequencies and sizes conversion
-        if not (
-            config_from_network.past_time * config_from_network.imu_freq_net
-        ).is_integer():
+        if abs((config_from_network.past_time * config_from_network.imu_freq_net) - round(config_from_network.past_time * config_from_network.imu_freq_net)) > 1e-5:
             raise ValueError(
                 "past_time cannot be represented by integer number of IMU data."
             )
-        if not (
-            config_from_network.window_time * config_from_network.imu_freq_net
-        ).is_integer():
+        if abs((config_from_network.window_time * config_from_network.imu_freq_net) - round(config_from_network.window_time * config_from_network.imu_freq_net)) > 1e-5:
             raise ValueError(
                 "window_time cannot be represented by integer number of IMU data."
             )

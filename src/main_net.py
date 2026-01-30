@@ -5,8 +5,8 @@ Output: 3x1 displacement, 3x1 covariance parameters
 """
 
 import network
-from .utils.argparse_utils import add_bool_arg
 
+from .utils.argparse_utils import add_bool_arg
 
 if __name__ == "__main__":
     import argparse
@@ -15,12 +15,14 @@ if __name__ == "__main__":
 
     # ------------------ directories -----------------
     # NOTE now they are assumed to be under root_dir with new format
-    #parser.add_argument("--train_list", type=str, default=None)
-    #parser.add_argument("--val_list", type=str, default=None)
-    #parser.add_argument("--test_list", type=str, default=None)
+    # parser.add_argument("--train_list", type=str, default=None)
+    # parser.add_argument("--val_list", type=str, default=None)
+    # parser.add_argument("--test_list", type=str, default=None)
     parser.add_argument(
-        "--root_dir", type=str, 
-        default="local_data/tlio_golden", help="Path to data directory"
+        "--root_dir",
+        type=str,
+        default="local_data/tlio_golden",
+        help="Path to data directory",
     )
     parser.add_argument("--out_dir", type=str, default="outputs/resnet_seq")
     parser.add_argument("--model_path", type=str, default=None)
@@ -36,8 +38,12 @@ if __name__ == "__main__":
     parser.add_argument("--input_dim", type=int, default=6)
     parser.add_argument("--output_dim", type=int, default=3)
     parser.add_argument("-j", "--workers", type=int, default=4)
-    parser.add_argument("--dataset_style", type=str, default="mmap", 
-            help="'ram', 'mmap', or 'iter'. See dataloader/tlio_data.py for more details")
+    parser.add_argument(
+        "--dataset_style",
+        type=str,
+        default="mmap",
+        help="'ram', 'mmap', or 'iter'. See dataloader/tlio_data.py for more details",
+    )
     add_bool_arg(parser, "persistent_workers", default=True)
 
     # ------------------ commons -----------------

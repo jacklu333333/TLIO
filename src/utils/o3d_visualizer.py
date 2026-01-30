@@ -1,15 +1,16 @@
 import os
-from shutil import rmtree
-import numpy as np
-import pandas as pd
 from collections import defaultdict
+from shutil import rmtree
 
+import numpy as np
 import open3d as o3d
+import pandas as pd
 from scipy.spatial.transform import Rotation
-from .math_utils import inv_SE3
+
 from .alignment import align_inertial_frames
 from .from_scipy import compute_euler_from_matrix
 from .logging import get_logger
+from .math_utils import inv_SE3
 
 logger = get_logger(__file__)
 
@@ -120,9 +121,7 @@ class O3dVisualizer:
         # Load raw vio if provided
         if self.vio_ghost is not None:
             self.full_t_us_vio = self.vio_ghost[:, 0]
-            self.full_T_World_Imu_vio = scaled_imu_pose_from_vio_ghost(
-                self.vio_ghost
-            )
+            self.full_T_World_Imu_vio = scaled_imu_pose_from_vio_ghost(self.vio_ghost)
             self.full_traj_pts_vio = self.full_T_World_Imu_vio[:, :3, 3]
 
         self.pointcloud_folder = pointcloud_folder
@@ -220,7 +219,7 @@ class O3dVisualizer:
         T_VisWorld_InputWorld=np.eye(4),
         max_traj_len=2000,
         with_frustrum=False,
-        size_coord_frame=0.5
+        size_coord_frame=0.5,
     ):
         self.add_traj_to_geometries(
             f"{name_prefix}_path",
@@ -285,7 +284,7 @@ class O3dVisualizer:
                 color=self.colors[i],
                 geometries=geometries,
                 max_traj_len=MAX_TRAJ_LEN,
-                size_coord_frame=0.5 if run_name == "tlio" else 0.5
+                size_coord_frame=0.5 if run_name == "tlio" else 0.5,
             )
 
         if self.vio_ghost is not None:
@@ -326,7 +325,7 @@ class O3dVisualizer:
                         geometries=geometries,
                         with_frustrum=True,
                         max_traj_len=20,
-                        size_coord_frame=0.4
+                        size_coord_frame=0.4,
                     )
             else:
                 logger.warning("Could not find close enough VIO timestamp for viz")
@@ -365,5 +364,5 @@ class O3dVisualizer:
                 mat.shader = "unlitLine"
                 mat.line_width = 10
                 self.vis.modify_geometry_material(gname, mat)
-        
+
         self.run_once()

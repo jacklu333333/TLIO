@@ -6,7 +6,6 @@ licensed under MIT
 import torch.nn as nn
 from torch.nn.utils import weight_norm
 
-
 dict_activation = {"ReLU": nn.ReLU, "GELU": nn.GELU}
 
 
@@ -101,7 +100,7 @@ class TemporalConvNet(nn.Module):
         layers = []
         num_levels = len(num_hidden_channels)
         for i in range(num_levels):
-            dilation_size = 2 ** i
+            dilation_size = 2**i
             in_channels = num_inputs if i == 0 else num_hidden_channels[i - 1]
             out_channels = num_hidden_channels[i]
             layers += [
@@ -117,7 +116,7 @@ class TemporalConvNet(nn.Module):
                 )
             ]
 
-        print("receptive field = ", 1 + 2 * (kernel_size - 1) * (2 ** num_levels - 1))
+        print("receptive field = ", 1 + 2 * (kernel_size - 1) * (2**num_levels - 1))
         self.network = nn.Sequential(*layers)
 
     def forward(self, x):

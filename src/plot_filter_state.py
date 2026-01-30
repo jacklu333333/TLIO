@@ -18,9 +18,9 @@ import progressbar
 from mpl_toolkits.mplot3d import Axes3D
 from scipy.interpolate import interp1d
 from scipy.spatial.transform import Rotation
+
 from .utils.logging import logging
 from .utils.math_utils import *
-
 
 color_vio = "C2"
 color_ronin = "C3"
@@ -185,9 +185,9 @@ def compute_rpe(rpe_ns, ps, ps_gt, yaw, yaw_gt):
     plt.figure("rpes list")
     plt.plot(rpes)
     ## compute statistics over z separatly
-    rpe_rmse = np.sqrt(np.mean(np.sum(rpes ** 2, axis=1)))
+    rpe_rmse = np.sqrt(np.mean(np.sum(rpes**2, axis=1)))
     rpe_rmse_z = np.sqrt(np.mean(rpes[:, 2] ** 2))
-    relative_yaw_rmse = np.sqrt(np.mean(relative_yaw_errors ** 2))
+    relative_yaw_rmse = np.sqrt(np.mean(relative_yaw_errors**2))
     return rpe_rmse, rpe_rmse_z, relative_yaw_rmse
 
 
@@ -286,25 +286,25 @@ def run(args, dataset):
         else:
             data = np.load(osp.join(args.root_dir, dataset, "imu0_resampled.npy"))
             vio_ts = data[:, 0] * 1e-6
-            vio_rq = data[:,-10:-6]
-            vio_p = data[:,-6:-3]
-            vio_v = data[:,-3:]
+            vio_rq = data[:, -10:-6]
+            vio_p = data[:, -6:-3]
+            vio_v = data[:, -3:]
             vio_r = Rotation.from_quat(vio_rq)
             vio_euls = vio_r.as_euler("xyz", degrees=True)
-            
+
             vio_calib_ts = vio_ts
 
-            with open(osp.join(args.root_dir, dataset, "calibration.json"), 'r') as f:
+            with open(osp.join(args.root_dir, dataset, "calibration.json"), "r") as f:
                 calib_json = json.load(f)
-                
-            accelBias = np.array(calib_json["Accelerometer"]["Bias"]["Offset"])[None,:]
-            gyroBias = np.array(calib_json["Gyroscope"]["Bias"]["Offset"])[None,:]
+
+            accelBias = np.array(calib_json["Accelerometer"]["Bias"]["Offset"])[None, :]
+            gyroBias = np.array(calib_json["Gyroscope"]["Bias"]["Offset"])[None, :]
             accelScaleInv = np.array(
                 calib_json["Accelerometer"]["Model"]["RectificationMatrix"]
-            )[None,:,:]
+            )[None, :, :]
             gyroScaleInv = np.array(
                 calib_json["Gyroscope"]["Model"]["RectificationMatrix"]
-            )[None,:,:]
+            )[None, :, :]
 
             vio_pj_idx = np.searchsorted(vio_ts, ts) - 1
             vio_pi_idx = np.searchsorted(vio_ts, ts - args.displacement_time) - 1
@@ -354,12 +354,8 @@ def run(args, dataset):
             # This compute bias in non scaled sensor frame (I think)
             ba_temp = np.expand_dims(ba, axis=-1)
             bg_temp = np.expand_dims(bg, axis=-1)
-            ba_b = np.squeeze(
-                np.matmul(np.linalg.inv(accelScaleInv), ba_temp)
-            )
-            bg_b = np.squeeze(
-                np.matmul(np.linalg.inv(gyroScaleInv), bg_temp)
-            )
+            ba_b = np.squeeze(np.matmul(np.linalg.inv(accelScaleInv), ba_temp))
+            bg_b = np.squeeze(np.matmul(np.linalg.inv(gyroScaleInv), bg_temp))
 
             if save_vio_states:
                 vio_states = np.concatenate(
@@ -450,26 +446,26 @@ def run(args, dataset):
         ref_disp = vio_disp
 
     # obtain biases in the body frame in the same unit
-#    attitude_filter_path = osp.join(args.root_dir, dataset, "atttitude.txt")
-#    (
-#        init_gyroScaleInv,
-#        init_gyroBias,
-#        init_gyroGSense,
-#        init_accelScaleInv,
-#        init_accelBias,
-#    ) = load_aekf_calibration(attitude_filter_path)
-#
-#    if args.body_bias:
-#        ba_temp = np.expand_dims(ba, axis=-1)
-#        bg_temp = np.expand_dims(bg, axis=-1)
-#        ba_b = np.squeeze(np.matmul(np.linalg.inv(init_accelScaleInv), ba_temp))
-#        bg_b = np.squeeze(np.matmul(np.linalg.inv(init_gyroScaleInv), bg_temp))
-#        ba = ba_b
-#        bg = bg_b
+    #    attitude_filter_path = osp.join(args.root_dir, dataset, "atttitude.txt")
+    #    (
+    #        init_gyroScaleInv,
+    #        init_gyroBias,
+    #        init_gyroGSense,
+    #        init_accelScaleInv,
+    #        init_accelBias,
+    #    ) = load_aekf_calibration(attitude_filter_path)
+    #
+    #    if args.body_bias:
+    #        ba_temp = np.expand_dims(ba, axis=-1)
+    #        bg_temp = np.expand_dims(bg, axis=-1)
+    #        ba_b = np.squeeze(np.matmul(np.linalg.inv(init_accelScaleInv), ba_temp))
+    #        bg_b = np.squeeze(np.matmul(np.linalg.inv(init_gyroScaleInv), bg_temp))
+    #        ba = ba_b
+    #        bg = bg_b
 
     # load aekf rotation
-    #aekf_ts, aekf_R = load_aekf_rotation(attitude_filter_path)
-    #aekf_euls = unwrap_rpy(aekf_R.as_euler("xyz", degrees=True))
+    # aekf_ts, aekf_R = load_aekf_rotation(attitude_filter_path)
+    # aekf_euls = unwrap_rpy(aekf_R.as_euler("xyz", degrees=True))
     # Hack since we don't have aekf data
     aekf_ts = ts
     aekf_euls = vio_euls
@@ -527,7 +523,7 @@ def run(args, dataset):
     metric_map["filter"]["drift_ratio"] = drift_filter / traj_length
     metric_map["filter"]["ate"] = ate_filter
     metric_map["filter"]["mhe"] = np.sqrt(
-        np.nansum(filter_heading_error ** 2)
+        np.nansum(filter_heading_error**2)
         / np.count_nonzero(~(np.isnan(filter_heading_error)))
     )
     metric_map["filter"]["angular_drift_deg_hour"] = (
@@ -568,7 +564,7 @@ def run(args, dataset):
         metric_map["ronin"]["ate"] = ate_ronin
 
         metric_map["ronin"]["mhe"] = np.sqrt(
-            np.nansum(heading_error_ronin ** 2)
+            np.nansum(heading_error_ronin**2)
             / np.count_nonzero(~(np.isnan(heading_error_ronin)))
         )
         metric_map["ronin"]["angular_drift_deg_hour"] = (
@@ -601,89 +597,89 @@ def run(args, dataset):
 
     # Plot results
     idxs = slice(start_idx, end_idx)
-    
-#    if not args.plot_sim:
-#        plt.figure("Calibration accelerometer vio vs init")
-#        plt.plot(ts, vio_accelScaleInv[:, 0, 0], label="1")
-#        plt.plot(ts, vio_accelScaleInv[:, 1, 1], label="2")
-#        plt.plot(ts, vio_accelScaleInv[:, 2, 2], label="3")
-#        plt.plot(ts, vio_accelScaleInv[:, 0, 1], label="12")
-#        plt.plot(ts, vio_accelScaleInv[:, 0, 2], label="13")
-#        plt.plot(ts, vio_accelScaleInv[:, 1, 2], label="23")
-#        plt.plot(
-#            ts,
-#            np.ones_like(vio_accelScaleInv[:, 0, 0]) * init_accelScaleInv[0, 0],
-#            label="1",
-#        )
-#        plt.plot(
-#            ts,
-#            np.ones_like(vio_accelScaleInv[:, 1, 1]) * init_accelScaleInv[1, 1],
-#            label="2",
-#        )
-#        plt.plot(
-#            ts,
-#            np.ones_like(vio_accelScaleInv[:, 2, 2]) * init_accelScaleInv[2, 2],
-#            label="2",
-#        )
-#        plt.plot(
-#            ts,
-#            np.ones_like(vio_accelScaleInv[:, 0, 1]) * init_accelScaleInv[0, 1],
-#            label="12",
-#        )
-#        plt.plot(
-#            ts,
-#            np.ones_like(vio_accelScaleInv[:, 0, 2]) * init_accelScaleInv[0, 2],
-#            label="13",
-#        )
-#        plt.plot(
-#            ts,
-#            np.ones_like(vio_accelScaleInv[:, 1, 2]) * init_accelScaleInv[1, 2],
-#            label="23",
-#        )
-#        plt.grid(True)
-#        plt.legend(loc="upper center")
-#        plt.figure()
-#        g = np.einsum("kip,p->ki", vio_accelScaleInv, [0, 9.81, 0])
-#        plt.plot(ts, g[:, 1])
-#        plt.figure("Calibration gyrometer vio vs init")
-#        plt.plot(ts, vio_gyroScaleInv[:, 0, 0], label="1")
-#        plt.plot(ts, vio_gyroScaleInv[:, 1, 1], label="2")
-#        plt.plot(ts, vio_gyroScaleInv[:, 2, 2], label="3")
-#        plt.plot(ts, vio_gyroScaleInv[:, 0, 1], label="12")
-#        plt.plot(ts, vio_gyroScaleInv[:, 0, 2], label="13")
-#        plt.plot(ts, vio_gyroScaleInv[:, 1, 2], label="23")
-#        plt.plot(
-#            ts,
-#            np.ones_like(vio_gyroScaleInv[:, 0, 0]) * init_gyroScaleInv[0, 0],
-#            label="1",
-#        )
-#        plt.plot(
-#            ts,
-#            np.ones_like(vio_gyroScaleInv[:, 1, 1]) * init_gyroScaleInv[1, 1],
-#            label="2",
-#        )
-#        plt.plot(
-#            ts,
-#            np.ones_like(vio_gyroScaleInv[:, 2, 2]) * init_gyroScaleInv[2, 2],
-#            label="2",
-#        )
-#        plt.plot(
-#            ts,
-#            np.ones_like(vio_gyroScaleInv[:, 0, 1]) * init_gyroScaleInv[0, 1],
-#            label="12",
-#        )
-#        plt.plot(
-#            ts,
-#            np.ones_like(vio_gyroScaleInv[:, 0, 2]) * init_gyroScaleInv[0, 2],
-#            label="13",
-#        )
-#        plt.plot(
-#            ts,
-#            np.ones_like(vio_gyroScaleInv[:, 1, 2]) * init_gyroScaleInv[1, 2],
-#            label="23",
-#        )
-#        plt.grid(True)
-#        plt.legend(loc="upper center")
+
+    #    if not args.plot_sim:
+    #        plt.figure("Calibration accelerometer vio vs init")
+    #        plt.plot(ts, vio_accelScaleInv[:, 0, 0], label="1")
+    #        plt.plot(ts, vio_accelScaleInv[:, 1, 1], label="2")
+    #        plt.plot(ts, vio_accelScaleInv[:, 2, 2], label="3")
+    #        plt.plot(ts, vio_accelScaleInv[:, 0, 1], label="12")
+    #        plt.plot(ts, vio_accelScaleInv[:, 0, 2], label="13")
+    #        plt.plot(ts, vio_accelScaleInv[:, 1, 2], label="23")
+    #        plt.plot(
+    #            ts,
+    #            np.ones_like(vio_accelScaleInv[:, 0, 0]) * init_accelScaleInv[0, 0],
+    #            label="1",
+    #        )
+    #        plt.plot(
+    #            ts,
+    #            np.ones_like(vio_accelScaleInv[:, 1, 1]) * init_accelScaleInv[1, 1],
+    #            label="2",
+    #        )
+    #        plt.plot(
+    #            ts,
+    #            np.ones_like(vio_accelScaleInv[:, 2, 2]) * init_accelScaleInv[2, 2],
+    #            label="2",
+    #        )
+    #        plt.plot(
+    #            ts,
+    #            np.ones_like(vio_accelScaleInv[:, 0, 1]) * init_accelScaleInv[0, 1],
+    #            label="12",
+    #        )
+    #        plt.plot(
+    #            ts,
+    #            np.ones_like(vio_accelScaleInv[:, 0, 2]) * init_accelScaleInv[0, 2],
+    #            label="13",
+    #        )
+    #        plt.plot(
+    #            ts,
+    #            np.ones_like(vio_accelScaleInv[:, 1, 2]) * init_accelScaleInv[1, 2],
+    #            label="23",
+    #        )
+    #        plt.grid(True)
+    #        plt.legend(loc="upper center")
+    #        plt.figure()
+    #        g = np.einsum("kip,p->ki", vio_accelScaleInv, [0, 9.81, 0])
+    #        plt.plot(ts, g[:, 1])
+    #        plt.figure("Calibration gyrometer vio vs init")
+    #        plt.plot(ts, vio_gyroScaleInv[:, 0, 0], label="1")
+    #        plt.plot(ts, vio_gyroScaleInv[:, 1, 1], label="2")
+    #        plt.plot(ts, vio_gyroScaleInv[:, 2, 2], label="3")
+    #        plt.plot(ts, vio_gyroScaleInv[:, 0, 1], label="12")
+    #        plt.plot(ts, vio_gyroScaleInv[:, 0, 2], label="13")
+    #        plt.plot(ts, vio_gyroScaleInv[:, 1, 2], label="23")
+    #        plt.plot(
+    #            ts,
+    #            np.ones_like(vio_gyroScaleInv[:, 0, 0]) * init_gyroScaleInv[0, 0],
+    #            label="1",
+    #        )
+    #        plt.plot(
+    #            ts,
+    #            np.ones_like(vio_gyroScaleInv[:, 1, 1]) * init_gyroScaleInv[1, 1],
+    #            label="2",
+    #        )
+    #        plt.plot(
+    #            ts,
+    #            np.ones_like(vio_gyroScaleInv[:, 2, 2]) * init_gyroScaleInv[2, 2],
+    #            label="2",
+    #        )
+    #        plt.plot(
+    #            ts,
+    #            np.ones_like(vio_gyroScaleInv[:, 0, 1]) * init_gyroScaleInv[0, 1],
+    #            label="12",
+    #        )
+    #        plt.plot(
+    #            ts,
+    #            np.ones_like(vio_gyroScaleInv[:, 0, 2]) * init_gyroScaleInv[0, 2],
+    #            label="13",
+    #        )
+    #        plt.plot(
+    #            ts,
+    #            np.ones_like(vio_gyroScaleInv[:, 1, 2]) * init_gyroScaleInv[1, 2],
+    #            label="23",
+    #        )
+    #        plt.grid(True)
+    #        plt.legend(loc="upper center")
 
     fig14 = plt.figure("position-2d")
     plt.plot(ps[idxs, 0], ps[idxs, 1], label="filter", color=color_filter)
@@ -933,7 +929,7 @@ def run(args, dataset):
         plt.subplot(3, 1, i + 1)
         plt.acorr(meas_err_update[:, i], maxlags=100, lw=2)
         locs, labels = plt.xticks()  # Get locations and labels
-        for (l, t) in zip(locs, labels):
+        for l, t in zip(locs, labels):
             t.set_text(str(l / 20.0) + "s")
         plt.xticks(locs, labels)  # Set locations and labels
         plt.xlim(left=0)
@@ -1137,9 +1133,9 @@ def compare_biases(args):
 
 
 if __name__ == "__main__":
+    import argparse
 
     from utils.argparse_utils import add_bool_arg
-    import argparse
 
     parser = argparse.ArgumentParser()
 

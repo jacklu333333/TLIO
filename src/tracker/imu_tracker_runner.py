@@ -4,14 +4,15 @@ import os
 
 import numpy as np
 import progressbar
-from ..dataloader.data_io import DataIO
 from scipy.interpolate import interp1d
 from scipy.spatial.transform import Rotation
+
+from ..dataloader.data_io import DataIO
 from ..tracker.imu_calib import ImuCalib
 from ..tracker.imu_tracker import ImuTracker
-from ..utils.o3d_visualizer import O3dVisualizer
 from ..utils.dotdict import dotdict
 from ..utils.logging import logging
+from ..utils.o3d_visualizer import O3dVisualizer
 
 
 class ImuTrackerRunner:

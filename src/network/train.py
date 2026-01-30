@@ -12,14 +12,16 @@ from os import path as osp
 
 import numpy as np
 import torch
-#from dataloader.dataset_fb import FbSequenceDataset
+from torch.utils.data import DataLoader
+from torch.utils.tensorboard import SummaryWriter
+
+# from dataloader.dataset_fb import FbSequenceDataset
 from ..dataloader.tlio_data import TlioData
 from ..network.losses import get_loss
 from ..network.model_factory import get_model
-from torch.utils.data import DataLoader
-from torch.utils.tensorboard import SummaryWriter
 from ..utils.logging import logging
 from ..utils.utils import to_device
+
 
 def torch_to_numpy(torch_arr):
     return torch_arr.cpu().detach().numpy()
@@ -40,12 +42,12 @@ def get_inference(network, data_loader, device, epoch, transforms=[]):
             sample = transform(sample)
         feat = sample["feats"]["imu0"]
         pred, pred_cov = network(feat)
-        
+
         if len(pred.shape) == 2:
-            targ = sample["targ_dt_World"][:,-1,:]
+            targ = sample["targ_dt_World"][:, -1, :]
         else:
             # Leave off zeroth element since it's 0's. Ex: Net predicts 199 if there's 200 GT
-            targ = sample["targ_dt_World"][:,1:,:].permute(0,2,1)
+            targ = sample["targ_dt_World"][:, 1:, :].permute(0, 2, 1)
 
         loss = get_loss(pred, pred_cov, targ, epoch)
 
@@ -75,7 +77,7 @@ def do_train(network, train_loader, device, epoch, optimizer, transforms=[]):
     train_targets, train_preds, train_preds_cov, train_losses = [], [], [], []
     network.train()
 
-    #for bid, (feat, targ, _, _) in enumerate(train_loader):
+    # for bid, (feat, targ, _, _) in enumerate(train_loader):
     for bid, sample in enumerate(train_loader):
         sample = to_device(sample, device)
         for transform in transforms:
@@ -85,10 +87,10 @@ def do_train(network, train_loader, device, epoch, optimizer, transforms=[]):
         pred, pred_cov = network(feat)
 
         if len(pred.shape) == 2:
-            targ = sample["targ_dt_World"][:,-1,:]
+            targ = sample["targ_dt_World"][:, -1, :]
         else:
             # Leave off zeroth element since it's 0's. Ex: Net predicts 199 if there's 200 GT
-            targ = sample["targ_dt_World"][:,1:,:].permute(0,2,1)
+            targ = sample["targ_dt_World"][:, 1:, :].permute(0, 2, 1)
 
         loss = get_loss(pred, pred_cov, targ, epoch)
 
@@ -96,20 +98,22 @@ def do_train(network, train_loader, device, epoch, optimizer, transforms=[]):
         train_preds.append(torch_to_numpy(pred))
         train_preds_cov.append(torch_to_numpy(pred_cov))
         train_losses.append(torch_to_numpy(loss))
-            
-        #print("Loss full: ", loss)
+
+        # print("Loss full: ", loss)
 
         loss = loss.mean()
         loss.backward()
 
-        #print("Loss mean: ", loss.item())
-        
-        #print("Gradients:")
-        #for name, param in network.named_parameters():
+        # print("Loss mean: ", loss.item())
+
+        # print("Gradients:")
+        # for name, param in network.named_parameters():
         #    if param.requires_grad:
         #        print(name, ": ", param.grad)
 
-        torch.nn.utils.clip_grad_norm_(network.parameters(), 0.1, error_if_nonfinite=True)
+        torch.nn.utils.clip_grad_norm_(
+            network.parameters(), 0.1, error_if_nonfinite=True
+        )
         optimizer.step()
 
     train_targets = np.concatenate(train_targets, axis=0)
@@ -126,7 +130,7 @@ def do_train(network, train_loader, device, epoch, optimizer, transforms=[]):
 
 
 def write_summary(summary_writer, attr_dict, epoch, optimizer, mode):
-    """ Given the attr_dict write summary and log the losses """
+    """Given the attr_dict write summary and log the losses"""
 
     mse_loss = np.mean((attr_dict["targets"] - attr_dict["preds"]) ** 2, axis=0)
     ml_loss = np.average(attr_dict["losses"])
@@ -136,7 +140,7 @@ def write_summary(summary_writer, attr_dict, epoch, optimizer, mode):
         assert mse_loss.shape[0] == 3
         mse_loss = mse_loss[:, -1]
         assert sigmas.shape[1] == 3
-        sigmas = sigmas[:,:,-1]
+        sigmas = sigmas[:, :, -1]
     summary_writer.add_scalar(f"{mode}_loss/loss_x", mse_loss[0], epoch)
     summary_writer.add_scalar(f"{mode}_loss/loss_y", mse_loss[1], epoch)
     summary_writer.add_scalar(f"{mode}_loss/loss_z", mse_loss[2], epoch)
@@ -158,7 +162,7 @@ def save_model(args, epoch, network, optimizer, best, interrupt=False):
     if interrupt:
         model_path = osp.join(args.out_dir, "checkpoints", "checkpoint_latest.pt")
     if best:
-        model_path = osp.join(args.out_dir, "checkpoint_best.pt")        
+        model_path = osp.join(args.out_dir, "checkpoint_best.pt")
     else:
         model_path = osp.join(args.out_dir, "checkpoints", "checkpoint_%d.pt" % epoch)
     state_dict = {
@@ -172,7 +176,7 @@ def save_model(args, epoch, network, optimizer, best, interrupt=False):
 
 
 def arg_conversion(args):
-    """ Conversions from time arguments to data size """
+    """Conversions from time arguments to data size"""
 
     if not (args.past_time * args.imu_freq).is_integer():
         raise ValueError(
@@ -218,7 +222,7 @@ def net_train(args):
     try:
         if args.root_dir is None:
             raise ValueError("root_dir must be specified.")
-        #if args.train_list is None:
+        # if args.train_list is None:
         #    raise ValueError("train_list must be specified.")
         if args.out_dir is not None:
             if not osp.isdir(args.out_dir):
@@ -234,7 +238,7 @@ def net_train(args):
             logging.info(f"Training output writes to {args.out_dir}")
         else:
             raise ValueError("out_dir must be specified.")
-        #if args.val_list is None:
+        # if args.val_list is None:
         #    logging.warning("val_list is not specified.")
         if args.continue_from is not None:
             if osp.exists(args.continue_from):
@@ -274,16 +278,16 @@ def net_train(args):
 
     train_loader, val_loader = None, None
     start_t = time.time()
-    
+
     data = TlioData(
-        args.root_dir, 
-        batch_size=args.batch_size, 
-        dataset_style=args.dataset_style, 
+        args.root_dir,
+        batch_size=args.batch_size,
+        dataset_style=args.dataset_style,
         num_workers=args.workers,
         persistent_workers=args.persistent_workers,
     )
     data.prepare_data()
-    
+
     train_list = data.get_datalist("train")
 
     """
@@ -305,7 +309,7 @@ def net_train(args):
     logging.info(f"Training set loaded. Loading time: {end_t - start_t:.3f}s")
     logging.info(f"Number of train samples: {len(data.train_dataset)}")
 
-    #if args.val_list is not None:
+    # if args.val_list is not None:
     if data.val_dataset is not None:
         val_list = data.get_datalist("val")
         """
@@ -360,9 +364,9 @@ def net_train(args):
     summary_writer.add_text("info", f"total_param: {total_params}")
 
     logging.info(f"-------------- Init, Epoch {start_epoch} --------------")
-    #attr_dict = get_inference(network, train_loader, device, start_epoch, train_transforms)
-    #write_summary(summary_writer, attr_dict, start_epoch, optimizer, "train")
-    #if val_loader is not None:
+    # attr_dict = get_inference(network, train_loader, device, start_epoch, train_transforms)
+    # write_summary(summary_writer, attr_dict, start_epoch, optimizer, "train")
+    # if val_loader is not None:
     #    attr_dict = get_inference(network, val_loader, device, start_epoch)
     #    write_summary(summary_writer, attr_dict, start_epoch, optimizer, "val")
 
@@ -384,7 +388,9 @@ def net_train(args):
 
         logging.info(f"-------------- Training, Epoch {epoch} ---------------")
         start_t = time.time()
-        train_attr_dict = do_train(network, train_loader, device, epoch, optimizer, train_transforms)
+        train_attr_dict = do_train(
+            network, train_loader, device, epoch, optimizer, train_transforms
+        )
         write_summary(summary_writer, train_attr_dict, epoch, optimizer, "train")
         end_t = time.time()
         logging.info(f"time usage: {end_t - start_t:.3f}s")

@@ -1,13 +1,15 @@
 import numpy as np
 import torch
+
 from ..network.covariance_parametrization import DiagonalParam
 from ..utils.logging import logging
 
 
 class MeasSourceTorchScript:
-    """ Loading a torchscript has the advantage that we do not need to reconstruct the original network class to
-        load the weights, the network structure is contained into the torchscript file.
+    """Loading a torchscript has the advantage that we do not need to reconstruct the original network class to
+    load the weights, the network structure is contained into the torchscript file.
     """
+
     def __init__(self, model_path, force_cpu=False):
         # load trained network model
         logging.info("Loding {}...".format(model_path))
@@ -33,7 +35,7 @@ class MeasSourceTorchScript:
             features_t = torch.unsqueeze(
                 torch.from_numpy(features.T).float().to(self.device), 0
             )  # 1 x 6 x N
-            
+
             netargs = [features_t]
             outputs = self.net(*netargs)
 

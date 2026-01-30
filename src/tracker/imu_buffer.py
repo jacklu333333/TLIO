@@ -3,7 +3,7 @@ from scipy.interpolate import interp1d
 
 
 class ImuBuffer:
-    """ This is a buffer for interpolated IMU data."""
+    """This is a buffer for interpolated IMU data."""
 
     def __init__(self):
         self.net_t_us = np.array([], dtype=int)
@@ -57,7 +57,7 @@ class ImuBuffer:
 
     # get network data from beginning and end timestamps
     def get_data_from_to(self, t_begin_us: int, t_us_end: int):
-        """ This returns all the data from ts_begin to ts_end """
+        """This returns all the data from ts_begin to ts_end"""
         assert isinstance(t_begin_us, int)
         assert isinstance(t_us_end, int)
         begin_idx = np.where(self.net_t_us == t_begin_us)[0][0]
@@ -68,8 +68,7 @@ class ImuBuffer:
         return net_acc, net_gyr, net_t_us
 
     def throw_data_before(self, t_begin_us: int):
-        """ throw away data with timestamp before ts_begin
-        """
+        """throw away data with timestamp before ts_begin"""
         assert isinstance(t_begin_us, int)
         begin_idx = np.where(self.net_t_us == t_begin_us)[0][0]
         self.net_acc = self.net_acc[begin_idx:, :]

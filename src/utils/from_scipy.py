@@ -6,7 +6,6 @@ import numpy as np
 
 from .quiet_numba import jit
 
-
 """
 This code is from scipy project with following license:
 

@@ -7,7 +7,6 @@ import numpy as np
 import numpy.testing as npt
 import tracker.scekf as scekf
 
-
 sys.path.insert(0, os.path.abspath("../.."))
 
 

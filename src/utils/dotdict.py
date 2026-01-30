@@ -10,9 +10,10 @@ class dotdict(dict):
             return self[name]
         except KeyError:
             raise AttributeError(name)
-    
+
     def __repr__(self):
         return super().__repr__()
+
 
 # Testing code
 if __name__ == "__main__":
@@ -20,4 +21,4 @@ if __name__ == "__main__":
     d.x = 7
     print(d)
     print(d.x)
-    print(d['x'])
+    print(d["x"])

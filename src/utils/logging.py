@@ -2,8 +2,9 @@
 
 # Put some color in you day!
 import logging
-import tqdm
 import sys
+
+import tqdm
 
 try:
     import coloredlogs

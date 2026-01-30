@@ -4,16 +4,19 @@ import os.path as osp
 import numpy as np
 import pandas as pd
 import torch
-#from dataloader.dataset_fb import FbSequenceDataset
-from ..dataloader.tlio_data import TlioData
+from torch.utils.data import DataLoader
+
 from ..dataloader.memmapped_sequences_dataset import MemMappedSequencesDataset
+
+# from dataloader.dataset_fb import FbSequenceDataset
+from ..dataloader.tlio_data import TlioData
 from ..network.losses import get_loss
 from ..network.model_factory import get_model
-from torch.utils.data import DataLoader
+from ..network.test import arg_conversion, get_datalist, get_inference, torch_to_numpy
 from ..utils.dotdict import dotdict
-from ..utils.utils import to_device
 from ..utils.logging import logging
-from ..network.test import torch_to_numpy, get_inference, get_datalist, arg_conversion, get_inference
+from ..utils.utils import to_device
+
 
 def net_eval(args):
     """
@@ -72,9 +75,9 @@ def net_eval(args):
         logging.info(f"Processing {data}...")
 
         try:
-            #seq_dataset = FbSequenceDataset(
+            # seq_dataset = FbSequenceDataset(
             #    args.root_dir, [data], args, data_window_config, mode="eval"
-            #)
+            # )
 
             seq_dataset = MemMappedSequencesDataset(
                 args.root_dir,
@@ -107,8 +110,8 @@ def net_eval(args):
         all_targets.append(attr_dict["targets"])
         all_errors.append(errors)
         all_sigmas.append(sigmas)
-        mse_losses.append(errors ** 2)
-        avg_mse_losses.append(np.mean(errors ** 2, axis=1).reshape(-1, 1))
+        mse_losses.append(errors**2)
+        avg_mse_losses.append(np.mean(errors**2, axis=1).reshape(-1, 1))
         likelihood_losses.append(attr_dict["losses"])
         avg_likelihood_losses.append(
             np.mean(attr_dict["losses"], axis=1).reshape(-1, 1)

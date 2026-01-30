@@ -1,5 +1,6 @@
 import torch
 
+
 # NOTE taken from pytorch3d due to difficulty putting it in environment.yaml
 # https://github.com/facebookresearch/pytorch3d/blob/7978ffd1e4819d24803b01a1147a2c33ad97c142/pytorch3d/transforms/so3.py#L148
 def hat(v: torch.Tensor) -> torch.Tensor:
@@ -35,10 +36,9 @@ def hat(v: torch.Tensor) -> torch.Tensor:
 
     return h
 
-def so3_exp_map(
-    log_rot: torch.Tensor, eps: float = 0.0001
-) -> torch.Tensor:
-#) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
+
+def so3_exp_map(log_rot: torch.Tensor, eps: float = 0.0001) -> torch.Tensor:
+    # ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
     """
     A helper function that computes the so3 exponential map and,
     apart from the rotation matrix, also returns intermediate variables
@@ -65,7 +65,7 @@ def so3_exp_map(
         + torch.eye(3, dtype=log_rot.dtype, device=log_rot.device)[None]
     )
 
-    return R #, rot_angles, skews, skews_square
+    return R  # , rot_angles, skews, skews_square
 
 
 def normalize_angle(theta):
@@ -77,7 +77,7 @@ def normalize_angle(theta):
 
 def sin_cos_pred_to_yaw(sin_cos, keepdim=False):
     """
-    Convert a sin/cos prediction from network to yaw angles 
+    Convert a sin/cos prediction from network to yaw angles
     (arbitrary batch dims supported).
 
     input:
@@ -89,9 +89,9 @@ def sin_cos_pred_to_yaw(sin_cos, keepdim=False):
     # No need to normalize sin/cos since arctan2 takes arbitrary x/y input
     # Normalizing sin/cos from network to be valid has a potential divide-by-zero error.
     # In reality, sin/cos doesn't even have to be in [-1,1] for this, but it can be.
-    yaw = torch.arctan2(sin_cos[...,0], sin_cos[...,1])
+    yaw = torch.arctan2(sin_cos[..., 0], sin_cos[..., 1])
     if keepdim:
-        return yaw[...,None]
+        return yaw[..., None]
     else:
         return yaw
 
@@ -101,11 +101,11 @@ def yaw_to_rot2D(yaw):
     Convert yaw to 2D rotation matrix (i.e., SO(2) matrix Exp map)
     (arbitrary batch dims supported).
 
-    The 2D rotation matrix is defined by 
-        
+    The 2D rotation matrix is defined by
+
         | cos(yaw) -sin(yaw) |
         | sin(yaw)  cos(yaw) |
-    
+
     as in https://github.com/strasdat/Sophus/blob/master/sophus/so2.hpp
 
     input:
@@ -116,9 +116,9 @@ def yaw_to_rot2D(yaw):
 
     cos_yaw = torch.cos(yaw)
     sin_yaw = torch.sin(yaw)
-    R = torch.empty(list(yaw.shape) + [2,2], device=yaw.device)
-    R[...,0,0], R[...,0,1] = cos_yaw, -sin_yaw
-    R[...,1,0], R[...,1,1] = sin_yaw, cos_yaw
+    R = torch.empty(list(yaw.shape) + [2, 2], device=yaw.device)
+    R[..., 0, 0], R[..., 0, 1] = cos_yaw, -sin_yaw
+    R[..., 1, 0], R[..., 1, 1] = sin_yaw, cos_yaw
     return R
 
 
@@ -127,11 +127,11 @@ def rot2D_to_yaw(R):
     Convert 2D rotation matrix (i.e., SO(2) matrix Log map) to yaw angle.
     (arbitrary batch dims supported).
 
-    The 2D rotation matrix is defined by 
-        
+    The 2D rotation matrix is defined by
+
         | cos(yaw) -sin(yaw) |
         | sin(yaw)  cos(yaw) |
-    
+
     as in https://github.com/strasdat/Sophus/blob/master/sophus/so2.hpp
 
     input:
@@ -139,5 +139,5 @@ def rot2D_to_yaw(R):
     output:
         yaw: tensor(float) [b0,b1,...] where b0,b1,... ar arbitrary batch dimensions.
     """
-    cos_yaw, sin_yaw = R[...,0,0], R[...,0,1]
+    cos_yaw, sin_yaw = R[..., 0, 0], R[..., 0, 1]
     return torch.arctan2(sin_yaw, cos_yaw)

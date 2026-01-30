@@ -17,22 +17,23 @@ from pprint import pprint
 import numpy as np
 from numba.core.errors import NumbaPerformanceWarning
 from tracker.imu_tracker_runner import ImuTrackerRunner
+
 from .utils.argparse_utils import add_bool_arg
 from .utils.logging import logging
-
 
 warnings.filterwarnings("ignore", category=NumbaPerformanceWarning)
 
 if __name__ == "__main__":
-
     parser = argparse.ArgumentParser()
 
     # ----------------------- io params -----------------------
     io_groups = parser.add_argument_group("io")
 
     io_groups.add_argument(
-        "--root_dir", type=str, 
-        default="local_data/tlio_golden", help="Path to data directory"
+        "--root_dir",
+        type=str,
+        default="local_data/tlio_golden",
+        help="Path to data directory",
     )
     io_groups.add_argument("--dataset_number", type=int, default=None)
     io_groups.add_argument("--model_path", type=str, default=None)
@@ -45,8 +46,9 @@ if __name__ == "__main__":
         "--start_from_ts", type=int, default=None
     )  # dataloader loading data from timestamp (us)
 
-    add_bool_arg(io_groups, "visualize", default=False, 
-            help="Opens up a visualization window")
+    add_bool_arg(
+        io_groups, "visualize", default=False, help="Opens up a visualization window"
+    )
     add_bool_arg(io_groups, "erase_old_log", default=False)
 
     # ----------------------- network params -----------------------
@@ -82,7 +84,9 @@ if __name__ == "__main__":
     filter_group.add_argument(
         "--init_bg_sigma", type=float, default=0.0001
     )  # rad/s  0.001
-    filter_group.add_argument("--init_ba_sigma", type=float, default=0.02)  # m/s^2  0.02
+    filter_group.add_argument(
+        "--init_ba_sigma", type=float, default=0.02
+    )  # m/s^2  0.02
     filter_group.add_argument("--g_norm", type=float, default=9.81)
 
     filter_group.add_argument("--meascov_scale", type=float, default=10.0)

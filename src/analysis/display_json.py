@@ -12,7 +12,6 @@ import pandas as pd
 import seaborn as sns
 from tabulate import tabulate
 
-
 blacklisted_datasets = []
 blacklisted_model = []
 golden_shared_dataset = []
@@ -58,9 +57,9 @@ def load_folder_to_dataframe(name_run, split, folder):
         d["hardware"] = [
             x
             for x in d.index.get_level_values(0)
-            #.str.split("_")
-            #.str.get(1)
-            #.str.replace("hidacori", "")
+            # .str.split("_")
+            # .str.get(1)
+            # .str.replace("hidacori", "")
         ]
         d["split"] = split
         d["name_run"] = osp.basename(name_run)
@@ -77,10 +76,10 @@ def load_folder_dict(ndict, split):
     """
     nmax_dataset = 0
     l = []
-    for (k, v) in ndict.items():
-        #try:
+    for k, v in ndict.items():
+        # try:
         l.append(load_folder_to_dataframe(k, split, v))
-        #except:
+        # except:
         #    print("Could not read from ", v)
     dataset_length = [len(el["dataset"].unique()) for el in l]
     nmax_dataset = max(dataset_length)
@@ -455,7 +454,6 @@ def getfunctions(module):
 list_of_plots = [o.__name__ for o in getfunctions(sys.modules[__name__])]
 
 if __name__ == "__main__":
-
     import argparse
 
     parser = argparse.ArgumentParser()

@@ -16,6 +16,7 @@ from math_utils import *
 from mpl_toolkits.mplot3d import Axes3D
 from scipy.interpolate import interp1d
 from scipy.spatial.transform import Rotation
+
 from utils.logging import logging
 
 
@@ -114,7 +115,7 @@ def plot_autocorellation(args, log_folder, n, dataset):
         plt.subplot(3, 1, i + 1)
         plt.acorr(meas_err_update[:, i], maxlags=100, lw=2, usevlines=False, label=n)
         locs, labels = plt.xticks()  # Get locations and labels
-        for (l, t) in zip(locs, labels):
+        for l, t in zip(locs, labels):
             t.set_text(str(l / 20.0) + "s")
         plt.xticks(locs, labels)  # Set locations and labels
         plt.xlim(left=0)
@@ -123,7 +124,6 @@ def plot_autocorellation(args, log_folder, n, dataset):
 
 
 if __name__ == "__main__":
-
     import argparse
 
     parser = argparse.ArgumentParser()
@@ -186,4 +186,3 @@ if __name__ == "__main__":
                     print(e)
                     logging.warning(f"Something went wrong with {dataset}")
                     continue
-

@@ -1,5 +1,6 @@
-import torch
 import numpy as np
+import torch
+
 from ..network.covariance_parametrization import DiagonalParam
 
 MIN_LOG_STD = np.log(1e-3)
@@ -37,7 +38,6 @@ pred_logstd:(Nx3) u = [log(sigma_x) log(sigma_y) log(sigma_z)]
 
 
 def loss_distribution_diag(pred, pred_logstd, targ):
-
     pred_logstd = torch.maximum(pred_logstd, MIN_LOG_STD * torch.ones_like(pred_logstd))
     loss = ((pred - targ).pow(2)) / (2 * torch.exp(2 * pred_logstd)) + pred_logstd
     return loss
@@ -76,6 +76,8 @@ all variables on gpu
 output:
   loss: Nx3
 """
+
+
 def get_loss(pred, pred_logstd, targ, epoch):
     """
     if epoch < 10:

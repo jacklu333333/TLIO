@@ -6,6 +6,7 @@ from typing import Optional
 import numpy as np
 from numba import jit
 from scipy.interpolate import interp1d
+
 from ..tracker.imu_buffer import ImuBuffer
 from ..tracker.imu_calib import ImuCalib
 from ..tracker.meas_source_torchscript import MeasSourceTorchScript
@@ -32,7 +33,6 @@ class ImuTracker:
         imu_calib: Optional[ImuCalib] = None,
         force_cpu=False,
     ):
-
         config_from_network = dotdict({})
         with open(model_param_path) as json_file:
             data_json = json.load(json_file)
@@ -42,11 +42,27 @@ class ImuTracker:
             config_from_network["arch"] = data_json["arch"]
 
         # frequencies and sizes conversion
-        if abs((config_from_network.past_time * config_from_network.imu_freq_net) - round(config_from_network.past_time * config_from_network.imu_freq_net)) > 1e-5:
+        if (
+            abs(
+                (config_from_network.past_time * config_from_network.imu_freq_net)
+                - round(
+                    config_from_network.past_time * config_from_network.imu_freq_net
+                )
+            )
+            > 1e-5
+        ):
             raise ValueError(
                 "past_time cannot be represented by integer number of IMU data."
             )
-        if abs((config_from_network.window_time * config_from_network.imu_freq_net) - round(config_from_network.window_time * config_from_network.imu_freq_net)) > 1e-5:
+        if (
+            abs(
+                (config_from_network.window_time * config_from_network.imu_freq_net)
+                - round(
+                    config_from_network.window_time * config_from_network.imu_freq_net
+                )
+            )
+            > 1e-5
+        ):
             raise ValueError(
                 "window_time cannot be represented by integer number of IMU data."
             )
@@ -107,7 +123,7 @@ class ImuTracker:
 
         # IMU initial calibration
         self.icalib = imu_calib
-        self.filter_tuning_cfg = filter_tuning_cfg # Config
+        self.filter_tuning_cfg = filter_tuning_cfg  # Config
         # MSCKF
         self.filter = ImuMSCKF(filter_tuning_cfg)
 
@@ -186,7 +202,7 @@ class ImuTracker:
 
     def _compensate_measurement_with_initial_calibration(self, gyr_raw, acc_raw):
         if self.icalib:
-            #logging.info("Using bias from initial calibration")
+            # logging.info("Using bias from initial calibration")
             init_ba = self.icalib.accelBias
             init_bg = self.icalib.gyroBias
             # calibrate raw imu data
@@ -194,7 +210,7 @@ class ImuTracker:
                 acc_raw, gyr_raw
             )  # removed offline bias and scaled
         else:
-            #logging.info("Using zero bias")
+            # logging.info("Using zero bias")
             init_ba = np.zeros((3, 1))
             init_bg = np.zeros((3, 1))
             acc_biascpst, gyr_biascpst = acc_raw, gyr_raw

@@ -1,5 +1,6 @@
 import numpy as np
 from numba import jit
+
 from ..utils.from_scipy import compute_euler_from_matrix
 from ..utils.logging import logging
 from ..utils.math_utils import Jr_exp, hat, mat_exp, mat_exp_vec, mat_log, rot_2vec
@@ -113,7 +114,7 @@ class State(object):
         return dX
 
     def generate_unobservable_shift(self):
-        """ returns a dX element along unobservable directions """
+        """returns a dX element along unobservable directions"""
         assert self.N == 0
         g = np.array([[0], [0], [1]])
         dX = np.zeros((15, 4))
@@ -160,7 +161,6 @@ def get_rotation_from_gravity(acc):
 
 class ImuMSCKF:
     def __init__(self, config=None):
-
         # sanity check
         expected_attribute = [
             "sigma_na",
@@ -352,7 +352,7 @@ class ImuMSCKF:
         return self.innovation, self.meas, self.pred, self.meas_sigma, self.inno_sigma
 
     def check_filter_convergence(self):
-        """ let us assume the filter has converged after 10 second"""
+        """let us assume the filter has converged after 10 second"""
         return self.state.si_timestamps_us[0] - self.last_timestamp_reset_us > int(
             10 * 1e6
         )
@@ -378,7 +378,6 @@ class ImuMSCKF:
         return True
 
     def propagate(self, acc, gyr, t_us, t_augmentation_us=None):
-
         R_k, v_k, p_k, b_ak, b_gk = (
             self.state.s_R,
             self.state.s_v,
@@ -462,10 +461,10 @@ class ImuMSCKF:
         self.state.unobs_shift = A_aug @ self.state.unobs_shift  # propagate unobs shift
 
     def update(self, meas, meas_cov, t_begin_us, t_end_us):
-        """ 
-           pred: pj - pi in the world frame
-           pred_cov: log(sigma) of the measurements in 3D
-           meas_cov [3 x 3] : covariance of measurement matrix 
+        """
+        pred: pj - pi in the world frame
+        pred_cov: log(sigma) of the measurements in 3D
+        meas_cov [3 x 3] : covariance of measurement matrix
         """
         if not self.converged and self.check_filter_convergence():
             logging.info("Filter is now assumed to have converged")
@@ -588,7 +587,6 @@ class ImuMSCKF:
         self.Sigma15 = self.Sigma[-15:, -15:]
 
     def marginalize(self, cut_idx):
-
         # marginalize states prior to cut_idx
         self.state.si_Rs = self.state.si_Rs[cut_idx + 1 :]
         self.state.si_ps = self.state.si_ps[cut_idx + 1 :]

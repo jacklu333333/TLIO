@@ -12,7 +12,7 @@ class BaseParams(ABC):
 
     @classmethod
     def toMahalanobisDistance(cls, target, mean, pred_cov, clamp_covariance=False):
-        """ Generic function that can be used once vec2Cov is implemented
+        """Generic function that can be used once vec2Cov is implemented
         can be reimplemented if a better way to do it exists with one parametrization
         Args:
             mean [n x 3] : vx, vy, vz

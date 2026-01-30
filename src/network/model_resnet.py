@@ -6,7 +6,7 @@ import torch.nn as nn
 
 
 def conv3x1(in_planes, out_planes, stride=1, groups=1, dilation=1):
-    """ 1D convolution with kernel size 3 """
+    """1D convolution with kernel size 3"""
     return nn.Conv1d(
         in_planes,
         out_planes,
@@ -20,12 +20,12 @@ def conv3x1(in_planes, out_planes, stride=1, groups=1, dilation=1):
 
 
 def conv1x1(in_planes, out_planes, stride=1):
-    """ 1D convolution with kernel size 1 """
+    """1D convolution with kernel size 1"""
     return nn.Conv1d(in_planes, out_planes, kernel_size=1, stride=stride, bias=False)
 
 
 class BasicBlock1D(nn.Module):
-    """ Supports: groups=1, dilation=1 """
+    """Supports: groups=1, dilation=1"""
 
     expansion = 1
 

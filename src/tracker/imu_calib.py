@@ -1,9 +1,10 @@
+import json
 import os.path as osp
 
-import json
 import numpy as np
-from ..utils.logging import logging
 from scipy.spatial.transform import Rotation
+
+from ..utils.logging import logging
 
 
 class ImuCalib:
@@ -17,22 +18,28 @@ class ImuCalib:
 
     def to_dict(self):
         return {
-            k: np.squeeze(getattr(self, k)).tolist() for k in (
-                "accelScaleInv", "gyroScaleInv", "gyroGSense", "accelBias", "gyroBias", "T_Device_Imu",
+            k: np.squeeze(getattr(self, k)).tolist()
+            for k in (
+                "accelScaleInv",
+                "gyroScaleInv",
+                "gyroGSense",
+                "accelBias",
+                "gyroBias",
+                "T_Device_Imu",
             )
         }
 
     def __repr__(self):
         return json.dumps(self.to_dict(), indent=4)
-    
+
     def to_file(self, file_name):
-        with open(file_name, 'w') as f:
+        with open(file_name, "w") as f:
             f.write(str(self))
 
     @classmethod
     def from_file(cls, file_name):
         ret = cls()
-        with open(file_name, 'r') as f:
+        with open(file_name, "r") as f:
             d = json.load(f)
         for k, v in d.items():
             setattr(ret, k, np.array(v))
@@ -40,7 +47,9 @@ class ImuCalib:
 
     @classmethod
     def from_attitude_file(cls, dataset, args):
-        raise NotImplementedError("This function is out of sync with the current codebase")
+        raise NotImplementedError(
+            "This function is out of sync with the current codebase"
+        )
         ret = cls()
         attitude_filter_path = osp.join(args.root_dir, dataset, "atttitude.txt")
         with open(attitude_filter_path, "r") as f:
@@ -57,14 +66,18 @@ class ImuCalib:
     @classmethod
     def from_unified_calib_dict_deprecated(cls, calib_dict):
         ret = cls()
-        ret.accelScaleInv = np.linalg.inv(np.array(calib_dict["accel_scale"]).reshape((3, 3)))
-        ret.gyroScaleInv = np.linalg.inv(np.array(calib_dict["gyro_scale"]).reshape((3, 3)))
+        ret.accelScaleInv = np.linalg.inv(
+            np.array(calib_dict["accel_scale"]).reshape((3, 3))
+        )
+        ret.gyroScaleInv = np.linalg.inv(
+            np.array(calib_dict["gyro_scale"]).reshape((3, 3))
+        )
         ret.gyroGSense = np.zeros((3, 3))
         ret.accelBias = np.array(calib_dict["accel_bias"]).reshape((3, 1))
         ret.gyroBias = np.array(calib_dict["gyro_bias"]).reshape((3, 1))
-        q_Device_Imu = np.array(calib_dict["T_ir"]['QuaternionXYZW'])
-        ret.T_Device_Imu[:3,:3] = Rotation.from_quat(q_Device_Imu).as_matrix()
-        ret.T_Device_Imu[:3,3] = calib_dict["T_ir"]["Translation"]
+        q_Device_Imu = np.array(calib_dict["T_ir"]["QuaternionXYZW"])
+        ret.T_Device_Imu[:3, :3] = Rotation.from_quat(q_Device_Imu).as_matrix()
+        ret.T_Device_Imu[:3, 3] = calib_dict["T_ir"]["Translation"]
         # NOTE we have to invert this legacy calib, as it's originally T_Imu_Device
         ret.T_Device_Imu = np.linalg.inv(ret.T_Device_Imu)
         return ret
@@ -72,16 +85,24 @@ class ImuCalib:
     @classmethod
     def from_calib_json(cls, calib_json):
         ret = cls()
-        ret.accelScaleInv = np.linalg.inv(np.array(calib_json["Accelerometer"]["Model"]["RectificationMatrix"]))
-        ret.gyroScaleInv = np.linalg.inv(np.array(calib_json["Gyroscope"]["Model"]["RectificationMatrix"]))
+        ret.accelScaleInv = np.linalg.inv(
+            np.array(calib_json["Accelerometer"]["Model"]["RectificationMatrix"])
+        )
+        ret.gyroScaleInv = np.linalg.inv(
+            np.array(calib_json["Gyroscope"]["Model"]["RectificationMatrix"])
+        )
         ret.gyroGSense = np.zeros((3, 3))
-        ret.accelBias = np.array(calib_json["Accelerometer"]["Bias"]["Offset"]).reshape((3, 1))
-        ret.gyroBias = np.array(calib_json["Gyroscope"]["Bias"]["Offset"]).reshape((3, 1))
+        ret.accelBias = np.array(calib_json["Accelerometer"]["Bias"]["Offset"]).reshape(
+            (3, 1)
+        )
+        ret.gyroBias = np.array(calib_json["Gyroscope"]["Bias"]["Offset"]).reshape(
+            (3, 1)
+        )
         q_Device_Imu = calib_json["T_Device_Imu"]["UnitQuaternion"]
         # scipy expects xyzw quat
         q_Device_Imu = np.array([*q_Device_Imu[1], q_Device_Imu[0]])
-        ret.T_Device_Imu[:3,:3] = Rotation.from_quat(q_Device_Imu).as_matrix()
-        ret.T_Device_Imu[:3,3] = calib_json["T_Device_Imu"]["Translation"]
+        ret.T_Device_Imu[:3, :3] = Rotation.from_quat(q_Device_Imu).as_matrix()
+        ret.T_Device_Imu[:3, 3] = calib_json["T_Device_Imu"]["Translation"]
         return ret
 
     @classmethod
@@ -106,17 +127,17 @@ class ImuCalib:
             "loading offline calib from "
             + osp.join(args.root_dir, dataset, "calibration.json")
         )
-        with open(osp.join(args.root_dir, dataset, "calibration.json"), 'r') as f:
+        with open(osp.join(args.root_dir, dataset, "calibration.json"), "r") as f:
             calib_json = json.load(f)
-            
-        ret.accelBias = np.array(calib_json["Accelerometer"]["Bias"]["Offset"])[:,None]
-        ret.gyroBias = np.array(calib_json["Gyroscope"]["Bias"]["Offset"])[:,None]
-        ret.accelScaleInv = np.linalg.inv(np.array(
-            calib_json["Accelerometer"]["Model"]["RectificationMatrix"]
-        ))
-        ret.gyroScaleInv = np.linalg.inv(np.array(
-            calib_json["Gyroscope"]["Model"]["RectificationMatrix"]
-        ))
+
+        ret.accelBias = np.array(calib_json["Accelerometer"]["Bias"]["Offset"])[:, None]
+        ret.gyroBias = np.array(calib_json["Gyroscope"]["Bias"]["Offset"])[:, None]
+        ret.accelScaleInv = np.linalg.inv(
+            np.array(calib_json["Accelerometer"]["Model"]["RectificationMatrix"])
+        )
+        ret.gyroScaleInv = np.linalg.inv(
+            np.array(calib_json["Gyroscope"]["Model"]["RectificationMatrix"])
+        )
         return ret
 
     def calibrate_raw(self, acc, gyr):
@@ -125,11 +146,7 @@ class ImuCalib:
         assert acc.shape == (3, N)
         assert gyr.shape == (3, N)
         acc_cal = self.accelScaleInv @ acc - self.accelBias
-        gyr_cal = (
-            self.gyroScaleInv @ gyr
-            - self.gyroGSense @ acc
-            - self.gyroBias
-        )
+        gyr_cal = self.gyroScaleInv @ gyr - self.gyroGSense @ acc - self.gyroBias
         assert acc_cal.shape == (3, N)
         assert gyr_cal.shape == (3, N)
 

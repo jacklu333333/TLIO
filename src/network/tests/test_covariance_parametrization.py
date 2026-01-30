@@ -62,11 +62,11 @@ class DiagonalBaseClass:
 
 
 class DiagonalParamTest(unittest.TestCase, DiagonalBaseClass, DiagonalParam):
-    """ Nothing to add here as test"""
+    """Nothing to add here as test"""
 
 
 class TestPearsonParamDiagonal(unittest.TestCase, DiagonalBaseClass, PearsonParam):
-    """ Add test with non diagonal entries"""
+    """Add test with non diagonal entries"""
 
     def test_nondiag_coef(self):
         cov_pred = torch.ones((1, self.covParamNumber))

@@ -6,7 +6,6 @@ from pprint import pprint
 
 from utils.logging import logging
 
-
 homedir = Path.home()
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

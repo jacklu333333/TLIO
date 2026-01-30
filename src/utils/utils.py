@@ -1,5 +1,6 @@
 import torch
 
+
 def make_recursive_func(func):
     def wrapper(args, device=None):
         if isinstance(args, list):

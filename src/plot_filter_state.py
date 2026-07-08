@@ -7,7 +7,6 @@ You can move the figures and state.txt, integration_states.txt, vio_states.txt i
 Rerun to generate graphs more efficiently by specifying the folder names that has the above three files
 """
 
-
 import json
 import os
 from os import path as osp

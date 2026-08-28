@@ -6,3 +6,5 @@ __pycache__
 *.swo
 models
 *outputs*
+__pycache__/
+*.py[cod]
